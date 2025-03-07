@@ -1,0 +1,14 @@
+n, m = map(int, input().split())
+time_fire = list(map(int, input().split()))
+
+def can_get_valid(time_fire, n, m):
+    if max(time_fire) > m:
+        return 'no'
+
+    total_t = time_fire[0]
+    for i in range(1,len(time_fire)):
+        total_t += (time_fire[i]-1)
+    print(total_t, n)
+    return 'yes' if (total_t - n) >= m else 'no'
+
+print(can_get_valid(time_fire, n, m))

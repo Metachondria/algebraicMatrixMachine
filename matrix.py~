@@ -47,7 +47,7 @@ class MatrixonRings:
         dist = [row.copy() for row in self.matrix]
 
         for k in range(n):
-            for i in range(n):
+            for i in range(n):пше ы
                 for j in range(n):
                     via_k = self.mul_op(dist[i][k], dist[k][j])
                     dist[i][j] = self.add_op(dist[i][j], via_k)
