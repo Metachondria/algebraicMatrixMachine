@@ -13,7 +13,7 @@ class MatrixonRings:
 
         return MatrixonRings(result_matrix, self.add_op, self.mul_op)
 
-    # можно сделать за O(n^log7)
+    # can do O(n^log7)
     def matmul(self, other):
         if self.cols != other.rows:
             raise ValueError("Miss dimention")
@@ -54,8 +54,9 @@ class MatrixonRings:
 
         return MatrixonRings(dist, add_op=self.add_op, mul_op=self.mul_op)
 
-    # метод для корректного вывода
     def __repr__(self):
         return f"{self.matrix}"
 
 
+matrix1 = MatrixonRings([[3, 10,1], [3, 4,1],[1,1,1]])
+print(matrix1.find_shortest())

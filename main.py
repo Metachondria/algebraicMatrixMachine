@@ -2,12 +2,11 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from matrix import MatrixonRings
 
-
 class MatrixApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Matrix Calculator")
-        self.root.geometry("900x600")
+        self.root.geometry("1000x700")
         self.root.configure(bg="#f0f0f0")
 
         self.matrix1_entries = []
@@ -76,23 +75,20 @@ class MatrixApp:
         self.create_matrix_container(left_frame, "Matrix 2", self.size2, self.matrix2_entries)
 
         # Панель управления
-        control_frame = ttk.LabelFrame(right_frame, text="Settings")
+        control_frame = ttk.LabelFrame(right_frame, text="Operations")
         control_frame.pack(fill="x", pady=10)
 
         # Выбор кольца
         tk.Label(control_frame, text="Ring:").grid(row=0, column=0, padx=5, pady=5)
         self.ring_var = tk.StringVar(value="float")
-        ttk.Radiobutton(control_frame, text="Float", variable=self.ring_var, value="float").grid(row=0, column=1,
-                                                                                                 padx=5)
-        ttk.Radiobutton(control_frame, text="Boolean", variable=self.ring_var, value="bool").grid(row=0, column=2,
-                                                                                                  padx=5)
+        ttk.Radiobutton(control_frame, text="Float", variable=self.ring_var, value="float").grid(row=0, column=1, padx=5)
+        ttk.Radiobutton(control_frame, text="Boolean", variable=self.ring_var, value="bool").grid(row=0, column=2, padx=5)
 
         # Выбор операции
-        tk.Label(control_frame, text="Operation:").grid(row=1, column=0, padx=5, pady=5)
+        tk.Label(control_frame, text="Basic operations:").grid(row=1, column=0, padx=5, pady=5)
         self.op_var = tk.StringVar(value="add")
         ttk.Radiobutton(control_frame, text="Add", variable=self.op_var, value="add").grid(row=1, column=1, padx=5)
-        ttk.Radiobutton(control_frame, text="Multiply", variable=self.op_var, value="multiply").grid(row=1, column=2,
-                                                                                                     padx=5)
+        ttk.Radiobutton(control_frame, text="Multiply", variable=self.op_var, value="multiply").grid(row=1, column=2, padx=5)
 
         # Кнопки
         button_frame = ttk.Frame(control_frame)
@@ -100,9 +96,43 @@ class MatrixApp:
         ttk.Button(button_frame, text="Back", command=self.create_welcome_screen).pack(side="left", padx=5)
         ttk.Button(button_frame, text="Calculate", command=self.perform_operation).pack(side="left", padx=5)
 
+        # Дополнительные операции
+        ttk.Label(control_frame, text="Advanced:").grid(row=3, column=0, padx=5, pady=5)
+        ttk.Button(control_frame, text="Floyd-Warshall (Matrix 1)",
+                  command=lambda: self.perform_floyd(1)).grid(row=3, column=1, columnspan=2, pady=5)
+        ttk.Button(control_frame, text="Floyd-Warshall (Matrix 2)",
+                  command=lambda: self.perform_floyd(2)).grid(row=4, column=1, columnspan=2, pady=5)
+
         # Результат
         self.result_frame = ttk.LabelFrame(right_frame, text="Result")
         self.result_frame.pack(fill="both", expand=True, pady=10)
+
+    def perform_floyd(self, matrix_num):
+        """Выполняет алгоритм Флойда-Уоршелла для выбранной матрицы"""
+        try:
+            # Получаем данные матрицы
+            if matrix_num == 1:
+                entries = self.matrix1_entries[0]
+                size = self.size1
+            else:
+                entries = self.matrix2_entries[0]
+                size = self.size2
+
+            # Проверяем что матрица квадратная
+            if size[0] != size[1]:
+                raise ValueError("Matrix must be square for Floyd-Warshall algorithm")
+
+            matrix = self.get_matrix_data(entries, is_bool=False)
+
+            # Создаем матрицу с операциями min и +
+            mat = MatrixonRings(matrix, add_op=min, mul_op=lambda a, b: a + b)
+            result = mat.find_shortest()
+
+            # Отображаем результат
+            self.create_matrix_view(self.result_frame, result.matrix, f"Floyd-Warshall Result (Matrix {matrix_num})")
+
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def create_matrix_container(self, parent, title, size, entries_list):
         """Контейнер для отображения одной матрицы"""
@@ -170,7 +200,7 @@ class MatrixApp:
                 result = mat1.matmul(mat2)
 
             # Отображаем результат
-            self.create_matrix_view(self.result_frame, result.matrix, "Result")
+            self.create_matrix_view(self.result_frame, result.matrix, "Operation Result")
 
         except Exception as e:
             messagebox.showerror("Error", str(e))
@@ -207,7 +237,6 @@ class MatrixApp:
         if self.ring_var.get() == "bool":
             return value.lower() in ('t', 'f', 'true', 'false', '0', '1', '')
         return True
-
 
 if __name__ == "__main__":
     root = tk.Tk()
